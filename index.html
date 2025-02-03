@@ -8,7 +8,7 @@
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, GithubAuthProvider } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA8fICsVOuCFWZoNTcuVGZakfJhMmsH2hY",
@@ -25,23 +25,23 @@
 
         function signInWithGoogle() {
             const provider = new GoogleAuthProvider();
-            signInWithRedirect(auth, provider);
+            signInWithPopup(auth, provider)
+                .catch(error => alert("خطأ: " + error.message));
         }
 
         function signInWithGitHub() {
             const provider = new GithubAuthProvider();
-            signInWithRedirect(auth, provider);
+            signInWithPopup(auth, provider)
+                .catch(error => alert("خطأ: " + error.message));
         }
 
-        getRedirectResult(auth)
-            .then(result => {
-                if (result?.user) {
-                    alert("مرحبًا " + result.user.displayName);
-                    document.getElementById("login-container").style.display = "none";
-                    document.getElementById("game-container").style.display = "grid";
-                }
-            })
-            .catch(error => alert("خطأ: " + error.message));
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                document.getElementById("login-container").style.display = "none";
+                document.getElementById("game-container").style.display = "grid";
+                alert("مرحبًا " + user.displayName);
+            }
+        });
     </script>
 
     <style>
