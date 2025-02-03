@@ -8,9 +8,9 @@
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
-        
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+
         // إعداد Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyA8fICsVOuCFWZoNTcuVGZakfJhMmsH2hY",
@@ -23,59 +23,52 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
         const auth = getAuth();
-        const database = getDatabase(app);
 
-        // تسجيل الدخول باستخدام Google
         function signInWithGoogle() {
             const provider = new GoogleAuthProvider();
             signInWithPopup(auth, provider)
-                .then(result => {
-                    document.getElementById("login-screen").style.display = "none";
-                    document.getElementById("game-screen").style.display = "block";
-                    alert("مرحبًا " + result.user.displayName);
-                })
-                .catch(error => {
-                    alert("حدث خطأ: " + error.message);
-                });
+                .then(result => alert("مرحبًا " + result.user.displayName))
+                .catch(error => alert("خطأ: " + error.message));
         }
 
-        function updateGameState(player, move) {
-            const gameRef = ref(database, 'games/1'); // يمكن أن تكون هنا رقم عشوائي أو خاص بكل لعبة
-            set(gameRef, {
-                currentPlayer: player,
-                move: move
-            });
+        function signInWithGitHub() {
+            const provider = new GithubAuthProvider();
+            signInWithPopup(auth, provider)
+                .then(result => alert("مرحبًا " + result.user.displayName))
+                .catch(error => alert("خطأ: " + error.message));
         }
     </script>
 
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #2c3e50;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #000;
             color: white;
             text-align: center;
+            margin: 0;
             padding: 20px;
         }
-
-        .button {
-            background-color: #3498db;
-            color: white;
-            padding: 15px 30px;
-            font-size: 18px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
+        .login-container {
+            margin-bottom: 20px;
         }
-
+        button {
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .google { background: white; color: black; }
+        .github { background: #333; color: white; }
         .game-container {
             display: grid;
             grid-template-columns: repeat(3, 80px);
             gap: 10px;
             justify-content: center;
-            margin-top: 20px;
         }
-
         .cell {
             width: 80px;
             height: 80px;
@@ -83,35 +76,29 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            background: #34495e;
+            background: #222;
             border-radius: 12px;
             cursor: pointer;
-        }
-
-        .hidden {
-            display: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول -->
-    <div id="login-screen">
-        <h2>تسجيل الدخول إلى اللعبة</h2>
-        <button class="button" onclick="signInWithGoogle()">تسجيل الدخول باستخدام Google</button>
+    <h2>لعبة X O</h2>
+
+    <!-- تسجيل الدخول -->
+    <div class="login-container">
+        <button class="google" onclick="signInWithGoogle()">🔵 تسجيل بـ Google</button>
+        <button class="github" onclick="signInWithGitHub()">🐙 تسجيل بـ GitHub</button>
     </div>
 
-    <!-- شاشة اللعبة -->
-    <div id="game-screen" class="hidden">
-        <h2>لعبة X O</h2>
-        <h3 id="status">دور اللاعب: X</h3>
-
-        <div class="game-container" id="gameBoard"></div>
-
-        <button class="button" onclick="resetGame()">إعادة اللعبة</button>
-    </div>
+    <!-- لوحة اللعبة -->
+    <div class="game-container" id="gameBoard"></div>
+    <h3 id="status">دور اللاعب: X</h3>
+    <button onclick="resetGame()">🔄 إعادة اللعبة</button>
 
     <script>
+        // لعبة X O
         let board = ["", "", "", "", "", "", "", "", ""];
         let currentPlayer = "X";
         const gameBoard = document.getElementById("gameBoard");
@@ -119,20 +106,19 @@
 
         function checkWinner() {
             const winningCombos = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8],
-                [0, 3, 6], [1, 4, 7], [2, 5, 8],
-                [0, 4, 8], [2, 4, 6]
+                [0,1,2], [3,4,5], [6,7,8],
+                [0,3,6], [1,4,7], [2,5,8],
+                [0,4,8], [2,4,6]
             ];
-
             for (let combo of winningCombos) {
                 const [a, b, c] = combo;
                 if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    statusText.innerText = `الفائز: ${board[a]}`;
+                    statusText.innerText = `🎉 الفائز: ${board[a]}`;
                     return true;
                 }
             }
             if (!board.includes("")) {
-                statusText.innerText = "تعادل!";
+                statusText.innerText = "⚖ تعادل!";
                 return true;
             }
             return false;
@@ -142,7 +128,6 @@
             if (!board[index]) {
                 board[index] = currentPlayer;
                 document.getElementById(index).innerText = currentPlayer;
-                updateGameState(currentPlayer, index);
                 if (!checkWinner()) {
                     currentPlayer = currentPlayer === "X" ? "O" : "X";
                     statusText.innerText = `دور اللاعب: ${currentPlayer}`;
