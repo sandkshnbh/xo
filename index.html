@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة X O</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
             background-color: #101010;
@@ -52,14 +54,54 @@
             border-radius: 10px;
             cursor: pointer;
         }
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #222;
+            border-radius: 30px;
+            display: flex;
+            padding: 10px 20px;
+            gap: 30px;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        .nav-icon {
+            color: #DCE0D9;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        .nav-icon.active {
+            color: #4CAF50;
+        }
+        .page {
+            display: none;
+            padding: 20px;
+        }
+        .page.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
 
-    <h1>لعبة X O</h1>
-    <div class="board" id="board"></div>
-    <div class="message" id="message"></div>
-    <button class="reset" onclick="resetGame()">إعادة اللعب</button>
+    <div id="gamePage" class="page active">
+        <h1>لعبة X O</h1>
+        <div class="board" id="board"></div>
+        <div class="message" id="message"></div>
+        <button class="reset" onclick="resetGame()">إعادة اللعب</button>
+    </div>
+
+    <div id="aboutPage" class="page">
+        <h1>حول اللعبة</h1>
+        <p>تم تطوير هذه اللعبة بواسطة <strong>سند كشنبه</strong></p>
+        <p>لعبة X O بتصميم داكن، ذكاء اصطناعي قوي، وعبارات ليبية مضحكة لجعل التجربة ممتعة!</p>
+    </div>
+
+    <div class="bottom-nav">
+        <span class="material-icons nav-icon active" onclick="showPage('gamePage', this)">sports_esports</span>
+        <span class="material-icons nav-icon" onclick="showPage('aboutPage', this)">info</span>
+    </div>
 
     <script>
         const boardElement = document.getElementById("board");
@@ -197,6 +239,13 @@
             gameOver = false;
             messageElement.textContent = "";
             createBoard();
+        }
+
+        function showPage(pageId, element) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.nav-icon').forEach(icon => icon.classList.remove('active'));
+            element.classList.add('active');
         }
 
         createBoard();
