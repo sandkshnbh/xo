@@ -5,7 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة X O</title>
 
-    <!-- أنماط التصميم -->
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, GithubAuthProvider } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA8fICsVOuCFWZoNTcuVGZakfJhMmsH2hY",
+            authDomain: "xosk-8188d.firebaseapp.com",
+            projectId: "xosk-8188d",
+            storageBucket: "xosk-8188d.firebasestorage.app",
+            messagingSenderId: "595305572913",
+            appId: "1:595305572913:web:d01272eb085c2833a7c310",
+            measurementId: "G-SYDQX5PMNY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+
+        function signInWithGoogle() {
+            const provider = new GoogleAuthProvider();
+            signInWithRedirect(auth, provider);
+        }
+
+        function signInWithGitHub() {
+            const provider = new GithubAuthProvider();
+            signInWithRedirect(auth, provider);
+        }
+
+        getRedirectResult(auth)
+            .then(result => {
+                if (result?.user) {
+                    alert("مرحبًا " + result.user.displayName);
+                    document.getElementById("login-container").style.display = "none";
+                    document.getElementById("game-container").style.display = "grid";
+                }
+            })
+            .catch(error => alert("خطأ: " + error.message));
+    </script>
+
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -27,12 +65,12 @@
             cursor: pointer;
         }
         .google { background: white; color: black; }
+        .github { background: #333; color: white; }
         .game-container {
-            display: grid;
+            display: none;
             grid-template-columns: repeat(3, 80px);
             gap: 10px;
             justify-content: center;
-            margin-top: 20px;
         }
         .cell {
             width: 80px;
@@ -45,7 +83,6 @@
             border-radius: 12px;
             cursor: pointer;
         }
-        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -54,65 +91,19 @@
 
     <!-- تسجيل الدخول -->
     <div id="login-container" class="login-container">
-        <button class="google" id="googleLogin">🔵 تسجيل بـ Google</button>
+        <button class="google" onclick="signInWithGoogle()">🔵 تسجيل بـ Google</button>
+        <button class="github" onclick="signInWithGitHub()">🐙 تسجيل بـ GitHub</button>
     </div>
 
-    <!-- لوحة اللعبة (تظهر بعد تسجيل الدخول) -->
-    <div id="game-container" class="hidden">
-        <h3 id="status">دور اللاعب: X</h3>
-        <div class="game-container" id="gameBoard"></div>
-        <button onclick="resetGame()">🔄 إعادة اللعبة</button>
-    </div>
-
-    <!-- Firebase -->
-    <script type="module">
-        // استيراد وظائف Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
-
-        // إعداد Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyA8fICsVOuCFWZoNTcuVGZakfJhMmsH2hY",
-            authDomain: "xosk-8188d.firebaseapp.com",
-            projectId: "xosk-8188d",
-            storageBucket: "xosk-8188d.firebasestorage.app",
-            messagingSenderId: "595305572913",
-            appId: "1:595305572913:web:d01272eb085c2833a7c310",
-            measurementId: "G-SYDQX5PMNY"
-        };
-
-        // تهيئة Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth();
-
-        // زر تسجيل الدخول
-        document.getElementById("googleLogin").addEventListener("click", () => {
-            const provider = new GoogleAuthProvider();
-            signInWithPopup(auth, provider)
-                .then(result => {
-                    alert("مرحبًا " + result.user.displayName);
-                    showGame();
-                })
-                .catch(error => alert("خطأ: " + error.message));
-        });
-
-        // التحقق من تسجيل الدخول تلقائيًا
-        onAuthStateChanged(auth, (user) => {
-            if (user) showGame();
-        });
-
-        // إظهار اللعبة بعد تسجيل الدخول
-        function showGame() {
-            document.getElementById("login-container").classList.add("hidden");
-            document.getElementById("game-container").classList.remove("hidden");
-        }
-    </script>
+    <!-- لوحة اللعبة -->
+    <div id="game-container" class="game-container"></div>
+    <h3 id="status">دور اللاعب: X</h3>
+    <button onclick="resetGame()">🔄 إعادة اللعبة</button>
 
     <script>
-        // لعبة X O
         let board = ["", "", "", "", "", "", "", "", ""];
         let currentPlayer = "X";
-        const gameBoard = document.getElementById("gameBoard");
+        const gameBoard = document.getElementById("game-container");
         const statusText = document.getElementById("status");
 
         function checkWinner() {
