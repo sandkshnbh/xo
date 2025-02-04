@@ -12,13 +12,36 @@
             src: url('sk.ttf') format('truetype');
         }
 
-        /* تطبيق الخط المخصص على جميع النصوص */
+        /* الثيمات والمتغيرات */
+        :root {
+            --main-bg: #101010;
+            --cell-bg: #1e1e1e;
+            --text-color: #DCE0D9;
+            --accent-color: #4CAF50;
+            --player-color: #DCE0D9;
+        }
+
+        .rosie-theme {
+            --main-bg: #ffb7c5;
+            --cell-bg: #ff85a2;
+            --text-color: #590d22;
+            --accent-color: #ff0a54;
+        }
+
+        .default-theme {
+            --main-bg: #101010;
+            --cell-bg: #1e1e1e;
+            --text-color: #DCE0D9;
+            --accent-color: #4CAF50;
+        }
+
         body {
-            background-color: #101010;
-            color: #DCE0D9;
             font-family: 'SKFont', Arial, sans-serif;
+            background-color: var(--main-bg);
+            color: var(--text-color);
             text-align: center;
             margin: 0;
+            transition: all 0.3s ease;
         }
 
         h1 {
@@ -37,8 +60,8 @@
         .cell {
             width: 100px;
             height: 100px;
-            background-color: #1e1e1e;
-            color: #DCE0D9;
+            background-color: var(--cell-bg);
+            color: var(--player-color);
             font-size: 32px;
             display: flex;
             align-items: center;
@@ -60,8 +83,8 @@
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 18px;
-            background-color: #333;
-            color: #DCE0D9;
+            background-color: var(--cell-bg);
+            color: var(--text-color);
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -72,7 +95,7 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #222;
+            background-color: var(--cell-bg);
             border-radius: 30px;
             display: flex;
             padding: 10px 20px;
@@ -81,13 +104,13 @@
         }
 
         .nav-icon {
-            color: #DCE0D9;
+            color: var(--text-color);
             font-size: 30px;
             cursor: pointer;
         }
 
         .nav-icon.active {
-            color: #4CAF50;
+            color: var(--accent-color);
         }
 
         .page {
@@ -104,10 +127,25 @@
             color: #1877F2;
             cursor: pointer;
         }
+
+        /* إعدادات جديدة */
+        .theme-option {
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid var(--text-color);
+        }
+
+        .color-picker {
+            margin: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: var(--cell-bg);
+        }
     </style>
 </head>
-<body>
-
+<body class="default-theme">
     <div id="gamePage" class="page active">
         <h1>لعبة X O</h1>
         <div class="board" id="board"></div>
@@ -119,17 +157,30 @@
         <h1>حول اللعبة</h1>
         <p>تم تطوير هذه اللعبة بواسطة <strong>سند كشنبه</strong></p>
         <p>لعبة X O بتصميم داكن، ذكاء اصطناعي قوي، وعبارات ليبية مضحكة لجعل التجربة ممتعة!</p>
-        
-        <!-- رابط إلى حساب فيسبوك باستخدام أيقونة فيسبوك -->
         <p>تابعني على فيسبوك:</p>
         <a href="https://www.facebook.com/sndkshnbh" target="_blank">
             <span class="material-icons facebook-icon">facebook</span>
         </a>
     </div>
 
+    <div id="settingsPage" class="page">
+        <h1>الإعدادات</h1>
+        <div class="theme-option default-theme" onclick="applyTheme('default-theme')">
+            ثيم سند كشنبه (الافتراضي)
+        </div>
+        <div class="theme-option rosie-theme" onclick="applyTheme('rosie-theme')">
+            ثيم روزي (بلاك بينك)
+        </div>
+        <div class="color-picker">
+            <label>اختر لون الشخصية:</label>
+            <input type="color" id="playerColor" onchange="updatePlayerColor(this.value)">
+        </div>
+    </div>
+
     <div class="bottom-nav">
         <span class="material-icons nav-icon active" onclick="showPage('gamePage', this)">sports_esports</span>
         <span class="material-icons nav-icon" onclick="showPage('aboutPage', this)">info</span>
+        <span class="material-icons nav-icon" onclick="showPage('settingsPage', this)">settings</span>
     </div>
 
     <script>
@@ -277,8 +328,16 @@
             element.classList.add('active');
         }
 
+        // وظائف الإعدادات الجديدة
+        function applyTheme(themeName) {
+            document.body.className = themeName;
+        }
+
+        function updatePlayerColor(color) {
+            document.documentElement.style.setProperty('--player-color', color);
+        }
+
         createBoard();
     </script>
-
 </body>
 </html>
